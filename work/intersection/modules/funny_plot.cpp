@@ -105,21 +105,32 @@ int FunnyPlot::func(int increment = 0) {
     cv::polylines(img, poly_1, 1, cv::Scalar(  0,   0, 255), 3);
     cv::polylines(img, poly_2, 1, cv::Scalar(255,   0, 255), 3);
 
+//  We have the polygons, ok! Now we need to find the intersection of them.
+//  The intersection is a polygon itself, and it represents the area of overlap
+//  between the both polygons of interest.
+//  We can use the OpenCV function intersectConvexConvex to find that polygon.
+//  It returns a boolean value indicating if the intersection was found or not.
+//  --------------------------------------------------------------
     std::vector<cv::Point2f> intersection;
     std::vector<cv::Point2f> poly1 = {m0.p1, m0.p2, m0.p3, m0.p4};
     std::vector<cv::Point2f> poly2 = {m1.p1, m1.p2, m1.p3, m1.p4};
+//  --------------------------------------------------------------
+//  We have a Point2f vector, but we need a Point vector to fill the polygon.
+//  The for is to convert the Point2f to Point.
     bool success = cv::intersectConvexConvex(poly1, poly2, intersection);
-
     if (success) {
         std::vector<cv::Point> intersection_int;
         intersection_int.resize(intersection.size());
         for(int i = 0; i < intersection.size(); i++) {
             intersection_int[i] = intersection[i];
         }
-     // cv::fillConvexPoly(img, pontos, num_pontos, cor, tipo_de_linha, posicao_do_shift)
+//  After the conversion, we can fill the polygon.
+     // cv::fillConvexPoly(img, points, num_points, color, line_type, shift_position)
         cv::fillConvexPoly(img, intersection_int, cv::Scalar(255, 255, 0));
     }
-
+//  --------------------------------------------------------------
+//  Now we can calculate the area of the intersection polygon.
+//  We use the OpenCV function contourArea to do that.
     double area = cv::contourArea(intersection);
     std::cout << "area: " << area << std::endl;
 
